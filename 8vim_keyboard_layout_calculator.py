@@ -383,39 +383,26 @@ def getVariableLetters(fullLayer, staticLetters):
     return varLetters
 
 def getScoreList(flowList, layerComfort, layerVsFlow):
-    # This prepares the fow-list and its reverse for the rest of the program.
+    # This prepares the flow-list and its reverse for the rest of the program.
 
     layerImportance = layerVsFlow
     flowImportance = 1-layerVsFlow
 
     layerScore = layerComfort * layerImportance
-    ratingList = []
-    
-    for flow in flowList:
-        flowScore = flow * flowImportance
-        
-        ratingList.append(flowScore + layerScore)
+    ratingList = [(flow * flowImportance + layerScore) for flow in flowList]
 
     ratings = enlargeList(ratingList)
 
-    reverseRatings = ratings[:] # The flow-list for the letters at the odd positions (see beginning of program) is just the
-    reverseRatings.reverse()     # same thing, but reversed.
-
-    return ratings, reverseRatings
+    # The flow-list for the letters at the odd positions (see
+    # beginning of program) is just the same thing, but reversed.
+    return ratings, list(reversed(ratings))
 
 def enlargeList(flowList):
     # This makes the flowList larger, in accordance to the number of layers
-    
-    flowList_end = len(flowList)
-
     firstSlots_flowList = flowList[:nrOfLettersInEachLayer]
-    lastslots_flowList = flowList[flowList_end-nrOfLettersInEachLayer:]
-    
-    j=0
-    while j < nrOfLayers:
-        flowList =  firstSlots_flowList + flowList + lastslots_flowList
-        j+=1
-    return flowList
+    lastslots_flowList = flowList[-nrOfLettersInEachLayer:]
+
+    return nrOfLayers * firstSlots_flowList + flowList + nrOfLayers * lastslots_flowList
 
 def getBigramList(letters):
     # This opens the bigram-list (the txt-file) and returns the letters and the frequencies of the required bigrams.
