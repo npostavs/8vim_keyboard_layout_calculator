@@ -467,7 +467,7 @@ def prepareAsciiArray(staticLetters):
     # This initializes the ascii-array.
     # It also creates the variable "emptySlots", which tells us what slots aren't filled by static letters. (in layer 1)
     asciiArray = [255]*256
-    emptySlots = [0]*8
+    emptySlots = [0]*nrOfLettersInEachLayer
     letterPlacement = 0
     j=0
     while letterPlacement < nrOfLettersInEachLayer:
