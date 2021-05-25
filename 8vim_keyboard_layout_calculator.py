@@ -140,7 +140,7 @@ def main():
     ###########################################################################################################################
     ###########################################################################################################################
 
-    staticLetters = lowercaseList(staticLetters)
+    staticLetters = list(map(str.lower, staticLetters))
     rating_evenPos_L1, rating_oddPos_L1 = getScoreList(flow_evenPos_L1, L1_comfort, layerVsFlow)
     rating_evenPos_L2, rating_oddPos_L2 = getScoreList(flow_evenPos_L2, L2_comfort, layerVsFlow)
     rating_evenPos_L3, rating_oddPos_L3 = getScoreList(flow_evenPos_L3, L3_comfort, layerVsFlow)
@@ -475,15 +475,6 @@ def filterBigrams(neededLetters ,bigrams, bigramFrequency):
         j+=1
 
     return trimmedBigrams, bigramFrequency
-
-def lowercaseList(list):
-    # This just takes any list and turns its uppercase letters into lowercase ones.
-    if len(list) != 0:
-        j=0
-        while j < len(list):
-            list[j] = list[j].lower()
-            j+=1
-        return list
 
 def prepareAsciiArray(staticLetters):
     # This initializes the ascii-array.
