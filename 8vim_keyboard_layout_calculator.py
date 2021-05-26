@@ -406,29 +406,17 @@ def enlargeList(flowList):
 
 def getBigramList(letters):
     # This opens the bigram-list (the txt-file) and returns the letters and the frequencies of the required bigrams.
-
-    fullBigramArray = []
     bigramFrequency = []
     bigrams = []
-    
-    # Prepare the bigram-letters
-    for bigram in itertools.permutations(letters, n_gramLength):
-        fullBigramArray.append(''.join(bigram))
-    for letter in letters:
-        fullBigramArray.append(letter+letter)
-        
-    # Filter out the bigrams that contain the predefined filler-symbol.
-    bigramArray = [ x for x in fullBigramArray if fillSymbol not in x ]
 
     # Read the file for the frequencies of the bigrams.
-    for currentBigram in bigramArray:
-        with open(bigramTxt, 'r') as bbl:
-            for line in bbl:
-                line = line.lower()
-                if currentBigram == line[0:n_gramLength]:
-                    bigramFrequency.append(int(line[line.find(' ')+1:]))
-                    bigrams.append(currentBigram)
-                    break
+    with open(bigramTxt, 'r') as bbl:
+        for line in bbl:
+            bigram, freq = line.lower().split()
+            # Filter out the bigrams that contain the predefined filler-symbol.
+            if bigram[0] in letters and bigram[1] in letters and not fillSymbol in bigram:
+                bigramFrequency.append(int(freq))
+                bigrams.append(bigram)
     return bigrams, bigramFrequency
 
 def getAbsoluteBigramCount():
