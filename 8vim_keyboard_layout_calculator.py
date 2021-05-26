@@ -494,29 +494,11 @@ def getLayouts(varLetters, staticLetters, layer2letters, layer3letters, layer4le
 def getPermutations(varLetters, staticLetters=[]):
     # This returns all possible letter-positions (permutations) with the input letters.
 
-    layouts = ['']*math.factorial(len(varLetters))
-
     if staticLetters: # this only activates for layer 1 (that has static letters)
-        layoutIteration=0
-        for letterCombination in itertools.permutations(varLetters): # try every layout
-            letterPlacement = 0
-            j=0
-            while letterPlacement < nrOfLettersInEachLayer:
-                if staticLetters[letterPlacement]:
-                    layouts[layoutIteration] += staticLetters[letterPlacement]
-                else:
-                    layouts[layoutIteration] += letterCombination[j]
-                    j+=1
-                letterPlacement += 1
-            layoutIteration+=1
-
+        staticPart = ''.join(staticLetters)
+        return [staticPart + ''.join(varPermutation) for varPermutation in itertools.permutations(varLetters)]
     else: # This is used for all layers except for layer 1
-        layoutIteration=0
-        for letterCombination in itertools.permutations(varLetters): # try every layout
-            layouts[layoutIteration] = ''.join(letterCombination)
-            layoutIteration+=1
-
-    return layouts
+        return [''.join(varPermutation) for varPermutation in itertools.permutations(varLetters)]
 
 def fillUpLayout(letters):
     # This small function creates full layouts out of only a few letters, while avoiding redundancy.
