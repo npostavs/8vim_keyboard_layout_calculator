@@ -2,6 +2,7 @@
 
 import enum
 import itertools
+import time
 
 # Read in bigram frequencies.
 BigramFrequencies = {}
@@ -93,6 +94,22 @@ customLayouts = {
 for layoutName,layoutString in customLayouts.items():
     cost = calcLayoutCost(layoutFromString(layoutString))
     print("%s cost = %-4.3f {%s}" % (layoutString, cost, layoutName))
+
+minCost = 9999
+minCostLayoutPerm = None
+checked = 0
+start_time = time.time()
+for layoutString in itertools.islice(itertools.permutations('eitsyanolhcdbrmukjzgpxfv----q--w'),10000):
+    layout = layoutFromString(layoutString)
+    cost = calcLayoutCost(layout)
+    checked += 1
+    if cost < minCost:
+        print("%s cost = %-4.3f {newmin}" % (''.join(layoutString), cost))
+        minCost = cost
+        minCostLayoutPerm = layoutString
+end_time = time.time()
+print("checked %d layouts in %.5f seconds" % (checked, (end_time - start_time)))
+print("%s cost = %-4.3f" % (''.join(minCostLayoutPerm), minCost))
 
 # Some debug stuff
 if False:
