@@ -6,6 +6,7 @@ import time
 
 # Read in bigram frequencies.
 BigramFrequencies = {}
+BigramTupleFrequencies = {}
 TotalBigramFrequency = 0
 with open('bigram_dictionaries/english_bigrams_1.txt', 'r') as bbl:
     for line in bbl:
@@ -16,6 +17,8 @@ with open('bigram_dictionaries/english_bigrams_1.txt', 'r') as bbl:
 # Normalize frequencies.
 for bigram in BigramFrequencies.keys():
     BigramFrequencies[bigram] /= TotalBigramFrequency
+    # use tuple encoding of bigram as alternate key
+    BigramTupleFrequencies[tuple(bigram)] = BigramFrequencies[bigram]
 
 class Sector(enum.Enum):
     TOP = 0
@@ -67,7 +70,7 @@ LayoutStringListingOrder = list(
 
 # This could be useful for optimizing cost calculation for many layouts at a time.
 MovementBigrams = (itertools.product(LayoutStringListingOrder, repeat=2))
-MovementBigramCosts = (itertools.starmap(bigramCost, MovementBigrams))
+MovementBigramCosts = list(itertools.starmap(bigramCost, MovementBigrams))
 
 def layoutFromString(layoutString):
     layout = {}
@@ -79,6 +82,13 @@ def calcLayoutCost(layout):
     cost = 0
     for bigram,freq in BigramFrequencies.items():
         cost += freq * bigramCost(layout[bigram[0]], layout[bigram[1]])
+    return cost
+
+def calcLayoutCost2(layoutString):
+    cost = 0
+    for layoutBigram,bigramCost in zip(itertools.product(layoutString, repeat=2), MovementBigramCosts):
+        if '-' not in layoutBigram:
+            cost += BigramTupleFrequencies[layoutBigram] * bigramCost
     return cost
 
 customLayouts = {
@@ -93,22 +103,24 @@ customLayouts = {
 
 for layoutName,layoutString in customLayouts.items():
     cost = calcLayoutCost(layoutFromString(layoutString))
-    print("%s cost = %-4.3f {%s}" % (layoutString, cost, layoutName))
+    cost2 = calcLayoutCost2(layoutString)
+    print("%s cost = %-4.3f [[%-4.3f]] {%s}" % (layoutString, cost, cost2, layoutName))
 
 minCost = 9999
 minCostLayoutPerm = None
-checked = 0
 start_time = time.time()
-for layoutString in itertools.islice(itertools.permutations('eitsyanolhcdbrmukjzgpxfv----q--w'),10000):
-    layout = layoutFromString(layoutString)
-    cost = calcLayoutCost(layout)
-    checked += 1
+permutations = 10000
+for layoutString in itertools.islice(itertools.permutations('eitsyanolhcdbrmukjzgpxfv----q--w'),permutations):
+    # layout = layoutFromString(layoutString)
+    # cost = calcLayoutCost(layout)
+    ## optimized version
+    cost = calcLayoutCost2(layoutString)
     if cost < minCost:
         print("%s cost = %-4.3f {newmin}" % (''.join(layoutString), cost))
         minCost = cost
         minCostLayoutPerm = layoutString
 end_time = time.time()
-print("checked %d layouts in %.5f seconds" % (checked, (end_time - start_time)))
+print("checked %d layouts in %.5f seconds" % (permutations, (end_time - start_time)))
 print("%s cost = %-4.3f" % (''.join(minCostLayoutPerm), minCost))
 
 # Some debug stuff
