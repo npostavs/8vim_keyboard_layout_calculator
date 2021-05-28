@@ -91,6 +91,31 @@ def calcLayoutCost2(layoutString):
             cost += BigramTupleFrequencies[layoutBigram] * bigramCost
     return cost
 
+def bestLayoutString(iLayoutStrings):
+    minCost = 9999
+    minCostLayoutPerm = None
+    alphabet = set('abcdefghijklmnopqrstuvwxyz')
+    for layoutString in iLayoutStrings:
+        #padding = ''
+        if len(layoutString) < len(alphabet):
+            layoutString += tuple(alphabet - set(layoutString))
+        # layout = layoutFromString(layoutString)
+        # cost = calcLayoutCost(layout)
+        ## optimized version
+        cost = calcLayoutCost2(layoutString)
+        if cost < minCost:
+            # print("%s cost = %-4.3f {newmin}" % (''.join(layoutString), cost))
+            minCost = cost
+            minCostLayoutPerm = layoutString
+    return (''.join(minCostLayoutPerm), minCost)
+
+def testLayouts(permutation_count, permutations):
+    start_time = time.process_time()
+    bestLayoutResult = bestLayoutString(itertools.islice(permutations,permutation_count))
+    end_time = time.process_time()
+    print("checked %d layouts in %.5f seconds" % (permutation_count, (end_time - start_time)))
+    print("%s cost = %-4.3f" % bestLayoutResult)
+
 customLayouts = {
     'Old / original 8VIM layout'               : 'eitsyanolhcdbrmukjzgpxfv----q--w',
     'English layout by sslater11'              : 'hitanerolfydmcsujwkgpxbv----q--z',
@@ -106,22 +131,11 @@ for layoutName,layoutString in customLayouts.items():
     cost2 = calcLayoutCost2(layoutString)
     print("%s cost = %-4.3f [[%-4.3f]] {%s}" % (layoutString, cost, cost2, layoutName))
 
-minCost = 9999
-minCostLayoutPerm = None
-start_time = time.time()
-permutations = 10000
-for layoutString in itertools.islice(itertools.permutations('eitsyanolhcdbrmukjzgpxfv----q--w'),permutations):
-    # layout = layoutFromString(layoutString)
-    # cost = calcLayoutCost(layout)
-    ## optimized version
-    cost = calcLayoutCost2(layoutString)
-    if cost < minCost:
-        print("%s cost = %-4.3f {newmin}" % (''.join(layoutString), cost))
-        minCost = cost
-        minCostLayoutPerm = layoutString
-end_time = time.time()
-print("checked %d layouts in %.5f seconds" % (permutations, (end_time - start_time)))
-print("%s cost = %-4.3f" % (''.join(minCostLayoutPerm), minCost))
+# testLayouts(10000, itertools.permutations('eitsyanolhcdbrmukjzgpxfv----q--w'))
+#testLayouts(1562275, itertools.permutations('abcdefghijklmnopqrstuvwxyz', 8))
+testLayouts(  100000, itertools.permutations('abcdefghijklmnopqrstuvwxyz', 8))
+# testLayouts(15622, itertools.permutations('abcdefghijklmnopqrstuvwxyz', 8))
+# testLayouts(15622, itertools.permutations('abcdefghijklmnopqrstuvwxyz', 8))
 
 # Some debug stuff
 if False:
